@@ -1,0 +1,11 @@
+# dependency
+node_modules
+src/admin-api/views/dashboard-client/node_modules
+src/admin-api/views/dashboard-client/build
+
+# misc
+.env
+.database.sqlite
+
+#log
+npm-debug.log
