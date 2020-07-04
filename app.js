@@ -7,7 +7,15 @@ const { Sequelize } = require('sequelize');
 /* init database */
 const sequelize = new Sequelize(require('./config/db'));
 const models = require('./models')(sequelize);
-sequelize.authenticate().catch(err => console.error(err));
+sequelize.authenticate()
+  .then(async () => {
+    const admin = await models.User.findOne({where: {username: 'admin'}});
+    if (!admin) {
+      console.log('Creating admin account...');
+      await models.User.create({username: 'admin', password: 'admin'});
+    }
+  })
+  .catch(err => console.error(err));
 
 /* init http server */
 server.set('trust proxy', 1);
