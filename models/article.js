@@ -26,4 +26,9 @@ module.exports = sequelize => sequelize.define('Article', {
     defaultValue: false
   },
   
+  isPublished: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  
 });
