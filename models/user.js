@@ -37,11 +37,11 @@ module.exports = sequelize => sequelize.define('User', {
   
 }, {
   hooks: {
-    async beforeCreate(user) {
-      user.password = await bcrypt.hash(
-        user.password, 
-        parseInt(process.env.SALT_ROUNDS) || 6
-      );
+    async beforeSave(instance) {
+      if (instance.changed('password')) {
+        const saltRounds = parseInt(process.env.SALT_ROUNDS) || 6;
+        instance.password = await bcrypt.hash(instance.password, saltRounds)
+      }
     }
   }
 });
