@@ -1,4 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
+const slugify = require('slugify');
+const cryptoRandomString = require('crypto-random-string');
 
 module.exports = sequelize => sequelize.define('Article', {
   
@@ -8,9 +10,7 @@ module.exports = sequelize => sequelize.define('Article', {
   },
   
   slug: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
+    type: DataTypes.STRING
   },
   
   content: {
@@ -31,4 +31,19 @@ module.exports = sequelize => sequelize.define('Article', {
     defaultValue: false
   },
   
+},  {
+  hooks: {
+    async beforeSave(instance) {
+      if (instance.changed('title')) {
+        const baseSlug = slugify(instance.title);
+        let slug = baseSlug + '-' + cryptoRandomString({length:4})
+        let isSlugExist = await this.findOne({where:{slug}});
+        while(isSlugExist) {
+          slug = baseSlug + '-' + cryptoRandomString({length:4});
+          isSlugExist = await this.findOne({where:{slug}});
+        }
+        instance.slug = slug;
+      }
+    }
+  }
 });
