@@ -8,6 +8,7 @@ module.exports = (models) => {
   
   router.use(authentication);
   router.use('/api/users', require('./routes/user')(models));
+  router.use('/api/articles', require('./routes/article')(models));
   
   router.get('*', (req, res) => res.sendStatus(404));
   
