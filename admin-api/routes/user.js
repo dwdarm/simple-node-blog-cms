@@ -1,4 +1,5 @@
 const express = require('express');
+const DEFAULT_LIMIT = 20;
 
 module.exports = ({User}) => {
   const router = express.Router();
@@ -28,10 +29,22 @@ module.exports = ({User}) => {
    
   router.get('/', async (req, res, next) => {
     try {
-      const users = await User.findAll({
+      const limit = parseInt(req.query.limit) || DEFAULT_LIMIT;
+      const offset = ((parseInt(req.query.page) || 1) - 1) * limit;
+      
+      const order = []
+      if (req.query.sort === 'username_asc') {
+        order.push(['username', 'ASC']);
+      } 
+      else if (req.query.sort === 'username_desc') {
+        order.push(['username', 'DESC']);
+      } 
+      
+       const { count, rows } = await User.findAndCountAll({
+        order, limit, offset,
         attributes: { exclude: ['password'] }
       });
-      res.send({ status: 'ok', data: users });
+      res.send({ status: 'ok', total: count, data: rows });
     } catch(err) {
       next(err);
     } 
