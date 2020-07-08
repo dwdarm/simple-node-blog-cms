@@ -31,9 +31,19 @@ module.exports = sequelize => sequelize.define('Article', {
     defaultValue: false
   },
   
+  isFeatured: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  
+  publishedAt: {
+    type: DataTypes.DATE,
+  }
+  
 },  {
   hooks: {
     async beforeSave(instance) {
+      
       if (instance.changed('title')) {
         const baseSlug = slugify(instance.title);
         let slug = baseSlug + '-' + cryptoRandomString({length:4})
@@ -44,6 +54,13 @@ module.exports = sequelize => sequelize.define('Article', {
         }
         instance.slug = slug;
       }
+      
+      if (instance.changed('isPublished')) {
+        if (instance.isPublished && !instance.publishedAt) {
+          instance.publishedAt = Date.now();
+        }
+      }
+      
     }
   }
 });
