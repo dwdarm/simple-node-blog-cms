@@ -1,5 +1,6 @@
 const express = require('express');
 const { Op } = require("sequelize");
+const DEFAULT_LIMIT = 20;
 
 module.exports = ({ Article, User, Category, Tag }) => {
   const router = express.Router();
@@ -7,13 +8,18 @@ module.exports = ({ Article, User, Category, Tag }) => {
   const getArticleById = async (req, res, next) => {
     try {
       const article = await Article.findByPk(req.params.id, {
+        attributes: { exclude: ['UserId'] },
         include: [
           { 
             model: User,
             attributes: { exclude: ['password'] }
           },
-          { model: Category },
-          { model: Tag }
+          { 
+            model: Category 
+          },
+          { 
+            model: Tag 
+          }
         ]
       });
       if (!article) {
@@ -47,17 +53,49 @@ module.exports = ({ Article, User, Category, Tag }) => {
    
   router.get('/', async (req, res, next) => {
     try {
-      const articles = await Article.findAll({
-        include: [
-          { 
-            model: User,
-            attributes: { exclude: ['password'] }
-          },
-          { model: Category },
-          { model: Tag }
-        ]
-      });
-      res.send({ status: 'ok', data: articles });
+      const query = {
+        attributes: { exclude: ['UserId'] }
+      }
+      
+      query.limit = parseInt(req.query.limit) || DEFAULT_LIMIT;
+      query.offset = ((parseInt(req.query.page) || 1) - 1) * query.limit;
+      
+      query.where = {}
+      if (typeof req.query.userId === 'string') { query.where.userId = req.query.userId; }
+      if (req.query.isPage) { where.isPage = true; }
+      if (req.query.isFeatured) { where.isFeatured = true; }
+      if (typeof req.query.status === 'string') {
+        if (req.query.status === 'published') { query.where.isPublished = true }
+        else if (req.query.status === 'draft') { query.where.isPublished = false }
+      }
+      
+      query.order = []
+      if (req.query.sort === 'title_asc') { query.order.push(['title', 'ASC']); } 
+      else if (req.query.sort === 'title_desc') { query.order.push(['title', 'DESC']); } 
+      else if (req.query.sort === 'created_asc') { query.order.push(['createdAt', 'ASC']); } 
+      else if (req.query.sort === 'created_desc') { query.order.push(['createdAt', 'DESC']); } 
+      else if (req.query.sort === 'updated_asc') { query.order.push(['updatedAt', 'ASC']); } 
+      else if (req.query.sort === 'updated_desc') { query.order.push(['updatedAt', 'DESC']); } 
+      
+      query.include = [
+        { 
+          model: User,
+          attributes: { exclude: ['password'] }
+        },
+        { 
+          model: Category,
+          where: typeof req.query.categoryId === 'string' ? { id: req.query.categoryId } : undefined
+        },
+        { 
+          model: Tag, 
+          where: typeof req.query.tagId === 'string' ? { id: req.query.tagId } : undefined
+        }
+      ]
+      
+      const { count, rows } = await Article.findAndCountAll(query);
+      
+      res.send({ status: 'ok', total: count, data: rows });
+      
     } catch(err) {
       next(err);
     } 
