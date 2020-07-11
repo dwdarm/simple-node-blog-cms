@@ -150,6 +150,15 @@ module.exports = ({ Article, User, Category, Tag }) => {
         }
       }
       
+      await article.reload({
+        attributes: { exclude: ['UserId'] },
+        include: [
+          { model: User, attributes: { exclude: ['password'] } },
+          { model: Category },
+          { model: Tag }
+        ]
+      });
+      
       res.status(201).send({ status: 'ok', data: article });
     } catch(err) {
       next(err);
