@@ -6,6 +6,11 @@ module.exports = ({User}) => {
   
   const getUserById = async (req, res, next) => {
     try {
+      if (req.params.id === 'me') {
+        req.user = { ...req.loggedUser.toJSON(), password: undefined };
+        return next();
+      }
+      
       const user = await User.findByPk(req.params.id, {
         attributes: { exclude: ['password'] }
       });
