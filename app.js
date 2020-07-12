@@ -5,7 +5,7 @@ const server = express();
 const { Sequelize } = require('sequelize');
 
 /* init database */
-const sequelize = new Sequelize(require('./config/db'));
+const sequelize = new Sequelize(process.env.DATABASE_URL || require('./config/db'));
 const models = require('./models')(sequelize);
 sequelize.authenticate()
   .then(async () => {
@@ -27,7 +27,6 @@ server.use(require('body-parser').json());
 // init routes
 server.use('/admin', require('./admin-api')(models));
 server.use('/client', require('./client-api')(models));
-server.use('/', express.static('./admin-client/dist'));
 
 // log error
 server.use((err, req, res, next) => {
