@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "export NODE_ENV=development && nodemon app.js",
     "client-dev": "webpack-dev-server --config ./admin-client/webpack.dev.js",
+    "build": "webpack --config ./admin-client/webpack.prod.js",
     "start": "export NODE_ENV=production && node app.js ",
     "test": "mocha --recursive"
   },
