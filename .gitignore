@@ -1,11 +1,10 @@
 # dependency
 node_modules
-src/admin-api/views/dashboard-client/node_modules
-src/admin-api/views/dashboard-client/build
 
 # misc
 .env
 .database.sqlite
+admin-client/dist
 
 #log
 npm-debug.log
