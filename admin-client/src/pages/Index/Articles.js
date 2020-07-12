@@ -43,7 +43,7 @@ const Articles = ({ articles, isFetching, hasMore, dispatch }) => {
       
       <ArticleList data={articles} />
       
-      { hasMore
+      { hasMore && !isFetching
         ? <div className="field is-grouped is-grouped-centered"> 
             <div className="control">
               <button 
@@ -54,6 +54,11 @@ const Articles = ({ articles, isFetching, hasMore, dispatch }) => {
               </button>
             </div>
           </div>
+        : null 
+      }
+      
+      { isFetching
+        ? <p className="has-text-centered">Loading...</p>
         : null 
       }
       

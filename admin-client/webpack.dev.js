@@ -23,6 +23,7 @@ module.exports = merge(common, {
   devServer: {
     proxy: {
       '/admin/api': 'http://localhost:3000'
-    }
+    },
+    historyApiFallback: true
   }
 });

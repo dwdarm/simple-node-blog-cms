@@ -14,6 +14,11 @@ export default (state = {}, { type, payload }) => {
           }
         }, {})
       }
+    case 'SET_AUTH':
+      return {
+        ...state,
+        [payload.user.id]: { ...payload.user }
+      }
     case 'INVALIDATE_USERS':
     case 'INVALIDATE':
       return {}

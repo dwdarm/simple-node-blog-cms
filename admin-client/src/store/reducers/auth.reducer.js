@@ -1,11 +1,11 @@
-const defaultState = { isFetching: false, isAuthenticated: false, user: null }
+const defaultState = { isFetching: false, isAuthenticated: false, userId: null }
 
 export default (state = { ...defaultState }, { type, payload }) => {
   switch(type) {
     case 'SET_AUTH':
       return {
         isAuthenticated: true,
-        user: payload.user,
+        userId: payload.user.id,
         isFetching: false
       }
     case 'REQUEST_AUTH':

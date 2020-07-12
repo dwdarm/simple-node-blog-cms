@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import configureStore from './store';
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Auth from './Auth';
 import Index from './pages/Index';
 import Category from './pages/Category';
@@ -18,7 +18,7 @@ export default class App extends React.Component {
     return (
       <Provider store={store}>
         <Auth>
-          <BrowserRouter>
+          <BrowserRouter basename="/admin">
             <Switch>
               <Route path="/article-edit/:id"><UpdateArticle/></Route>
               <Route path="/new"><NewArticle/></Route>
