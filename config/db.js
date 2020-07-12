@@ -9,4 +9,6 @@ else {
   dbConfig.host = process.env.DATABASE_HOST;
 }
 
+dbConfig.logging = process.env.NODE_ENV === 'development';
+
 module.exports = dbConfig;

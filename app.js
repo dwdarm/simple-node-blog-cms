@@ -27,6 +27,7 @@ server.use(require('body-parser').json());
 // init routes
 server.use('/admin', require('./admin-api')(models));
 server.use('/client', require('./client-api')(models));
+server.use('/', express.static('./admin-client/dist'));
 
 // log error
 server.use((err, req, res, next) => {
