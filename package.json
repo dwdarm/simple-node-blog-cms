@@ -21,6 +21,8 @@
     "express": "^4.17.1",
     "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
+    "pg": "^8.3.0",
+    "pg-hstore": "^2.3.3",
     "reading-time": "^1.2.0",
     "sequelize": "^6.3.0",
     "slugify": "^1.4.4",
