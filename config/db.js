@@ -7,6 +7,9 @@ if (dbConfig.dialect === 'sqlite') {
 } 
 else {
   dbConfig.host = process.env.DATABASE_HOST;
+  dbConfig.database = process.env.DATABASE_DB;
+  dbConfig.username = process.env.DATABASE_USER;
+  dbConfig.database = process.env.DATABASE_DB;
 }
 
 dbConfig.logging = process.env.NODE_ENV === 'development';
