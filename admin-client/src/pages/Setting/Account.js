@@ -10,10 +10,8 @@ const Account = ({ user, dispatch }) => {
   const avatarRef = useRef(null);
   const aboutRef = useRef(null);
   const emailRef = useRef(null);
-  const [ isSending, setIsSending ] = useState(false);
   
   const handleUpdateUser = () => {
-    setIsSending(true);
     dispatch(updateUser(user.id, {
       username: usernameRef.current.value,
       fullName: nameRef.current.value,
@@ -21,7 +19,6 @@ const Account = ({ user, dispatch }) => {
       about: aboutRef.current.value,
       email: emailRef.current.value
     }, localStorage.getItem('token')))
-    .then(() => setIsSending(false));
   }
   
   useEffect(() => {
@@ -102,7 +99,7 @@ const Account = ({ user, dispatch }) => {
         <div className="control">
           <button 
             className="button is-success"
-            disabled={isSending ? true : undefined}
+            disabled={user.isReqPut ? true : undefined}
             onClick={handleUpdateUser}>
             Save
           </button>

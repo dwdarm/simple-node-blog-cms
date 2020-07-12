@@ -10,11 +10,37 @@ const addArticles = (articles = []) => {
   }
 }
 
-export const invalidateArticles = () => {
-  return { type: 'INVALIDATE_ARTICLES' }
-}
+const setReqGetArticles = (id, status = false) => ({
+  type: 'SET_REQ_GET_ARTICLES', payload: { id, status }
+});
 
-export const getArticle = (id, token) => async (dispatch) => {
+const setReqPutArticles = (id, status = false) => ({
+  type: 'SET_REQ_PUT_ARTICLES', payload: { id, status }
+});
+
+const setReqDelArticles = (id, status = false) => ({
+  type: 'SET_REQ_DEL_ARTICLES', payload: { id, status }
+});
+
+const setExistArticles = (id, status = true) => ({
+  type: 'SET_EXIST_ARTICLES', payload: { id, status }
+});
+
+export const invalidateArticles = () => ({
+  type: 'INVALIDATE_ARTICLES'
+});
+
+export const getArticle = (id, token, force = false) => async (dispatch, getState) => {
+  const { article } = getState();
+  
+  if (article[id]) {
+    if (article[id].isReqGet || !article[id].isExist) {
+      return Promise.resolve();
+    }
+  }
+  
+  dispatch(setReqGetArticles(id, true));
+  
   const res = await fetch(`/admin/api/articles/${id}`, {
     headers: {
       'Authorization': `Bearer ${token}`
@@ -22,6 +48,11 @@ export const getArticle = (id, token) => async (dispatch) => {
   });
   
   if (res.status !== 200) {
+    if (res.status === 404) {
+      setExistArticles(id, false);
+    }
+    
+    dispatch(setReqGetArticles(id));
     return Promise.reject();
   }
   
@@ -51,7 +82,17 @@ export const postArticle = (data = {}, token) => async (dispatch) => {
   return json.data;
 }
 
-export const updateArticle = (id, data = {}, token) => async (dispatch) => {
+export const updateArticle = (id, data = {}, token) => async (dispatch, getState) => {
+  const { article } = getState();
+  
+  if (article[id]) {
+    if (article[id].isReqPut || !article[id].isExist) {
+      return Promise.resolve();
+    }
+  }
+  
+  dispatch(setReqPutArticles(id, true));
+  
   const res = await fetch(`/admin/api/articles/${id}`, {
     method: 'PUT',
     headers: {
@@ -62,6 +103,11 @@ export const updateArticle = (id, data = {}, token) => async (dispatch) => {
   });
   
   if (res.status !== 200) {
+    if (res.status === 404) {
+      setExistArticles(id, false);
+    }
+    
+    dispatch(setReqPutArticles(id));
     return Promise.reject();
   }
   
@@ -71,7 +117,17 @@ export const updateArticle = (id, data = {}, token) => async (dispatch) => {
   return json.data;
 }
 
-export const deleteArticle = (id, token) => async (dispatch) => {
+export const deleteArticle = (id, token) => async (dispatch, getState) => {
+  const { article } = getState();
+  
+  if (article[id]) {
+    if (article[id].isReqDel || !article[id].isExist) {
+      return Promise.resolve();
+    }
+  }
+  
+  dispatch(setReqDelArticles(id, true));
+  
   const res = await fetch(`/admin/api/articles/${id}`, { 
     method: 'DELETE',
     headers: {
@@ -80,6 +136,11 @@ export const deleteArticle = (id, token) => async (dispatch) => {
   });
   
   if (res.status !== 200) {
+    if (res.status === 404) {
+      setExistArticles(id, false);
+    }
+    
+    dispatch(setReqDelArticles(id));
     return Promise.reject();
   }
 

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getLoggedUser } from './store/actions/auth.action';
 import Login from './pages/Login';
 
-const Auth = ({isAuthenticated, dispatch, children}) => {
+const Auth = ({ isAuthenticated, dispatch, children }) => {
   
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -22,9 +22,8 @@ const Auth = ({isAuthenticated, dispatch, children}) => {
   );
 }
 
-const mapStateToProps = (state) => ({
-  isAuthenticated: state.auth.isAuthenticated,
-  isFetching: state.auth.isFetching
+const mapStateToProps = ({ auth }) => ({
+  isAuthenticated: auth.isAuthenticated
 });
 
 export default connect(mapStateToProps)(Auth);

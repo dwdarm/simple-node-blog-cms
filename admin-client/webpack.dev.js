@@ -3,6 +3,9 @@ const common = require("./webpack.common.js");
           
 module.exports = merge(common, {
   mode: "development",
+  output: {
+    publicPath: '/'
+  },
   module: {
     rules: [
       {
@@ -24,6 +27,10 @@ module.exports = merge(common, {
     proxy: {
       '/admin/api': 'http://localhost:3000'
     },
-    historyApiFallback: true
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/admin\/.*$/, to: '/index.html'}
+      ]
+    }
   }
 });

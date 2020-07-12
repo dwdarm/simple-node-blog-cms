@@ -3,7 +3,7 @@ import SideBar from './SideBar';
 
 export default ({children}) => (
   <div className="columns is-gapless" style={{minHeight: '100vh'}}>
-    <div className="column is-narrow has-background-light" style={{width: '250px'}}>
+    <div className="sidebar column is-narrow has-background-light">
       <SideBar/>
     </div>
     <div className="column">

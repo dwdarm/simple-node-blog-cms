@@ -7,13 +7,10 @@ const Password = ({ user, dispatch }) => {
   const history = useHistory();
   const [ password, setPassword ] = useState('');
   const [ confirmPassword, setConfirmPassword ] = useState('');
-  const [ isSending, setIsSending ] = useState(false);
   
   const handleUpdateUser = () => {
     if ((password.length >= 8) && (password === confirmPassword)) {
-      setIsSending(true);
       dispatch(updateUser(user.id, { password }, localStorage.getItem('token')))
-      .then(() => setIsSending(false));
     }
   }
   
@@ -62,7 +59,7 @@ const Password = ({ user, dispatch }) => {
         <div className="control">
           <button 
             className="button is-success"
-            disabled={isSending ? true : undefined}
+            disabled={user.isReqPut ? true : undefined}
             onClick={handleUpdateUser}>
             Save
           </button>

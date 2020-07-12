@@ -22,8 +22,6 @@ const Form = ({ article, dispatch }) => {
   const [ tags, setTags ] = useState([]);
   const [ options, setOptions ] = useState({ isPublished: false, isFeatured: false });
   const [ isFetched, setIsFetched ] = useState(false);
-  const [ isLoading, setIsLoading ] = useState(false);
-  const [ isSending, setIsSending ] = useState(false);
   const [ error, setError ] = useState({ isError: false, text: '' });
   const [ showDeleteDialog, setShowDeleteDialog ] = useState(false);
   const history = useHistory();
@@ -33,16 +31,14 @@ const Form = ({ article, dispatch }) => {
       history.replace('/'); 
     } 
     else {
-      if (!isLoading && !isFetched) {
-        setIsLoading(true);
+      if (!isFetched) {
+        setIsFetched(true);
         dispatch(getArticle(article.id, localStorage.getItem('token')))
         .then(() => {
           setCategories(article.Categories.map(e => e.id.toString()));
           setTags(article.Tags.map(e => e.id.toString()));
           setOptions({ isPublished: article.isPublished, isFeatured: article.isFeatured });
-          setIsFetched(true);
-          setIsLoading(false);
-        });
+        })
       }
     }
   });
@@ -79,37 +75,31 @@ const Form = ({ article, dispatch }) => {
     })
   }
   
-  const handlePostArticle = () => {
-    setIsSending(true);
-    dispatch(updateArticle(article.id, {
-      title: titleRef.current.value,
-      urlToHeader: headerRef.current.value,
-      content: contentRef.current.value,
-      categories: categories.map(e => parseInt(e)),
-      tags: tags.map(e => parseInt(e)),
-      ...options
-    }, localStorage.getItem('token')))
-    .then(json => {
+  const handlePostArticle = async () => {
+    try {
+      await dispatch(updateArticle(article.id, {
+        title: titleRef.current.value,
+        urlToHeader: headerRef.current.value,
+        content: contentRef.current.value,
+        categories: categories.map(e => parseInt(e)),
+        tags: tags.map(e => parseInt(e)),
+        ...options
+      }, localStorage.getItem('token')));
       dispatch(invalidateArticles());
       history.replace('/');
-    })
-    .catch((err) => {
-      setIsSending(false);
+    } catch(err) {
       setError({ isError: true, text: err });
-    });
+    }
   }
   
-  const handleDeleteArticle = () => {
-    setIsSending(true);
-    dispatch(deleteArticle(article.id, localStorage.getItem('token')))
-    .then(json => {
+  const handleDeleteArticle = async () => {
+    try {
+      await dispatch(deleteArticle(article.id, localStorage.getItem('token')));
       dispatch(invalidateArticles());
       history.replace('/');
-    })
-    .catch((err) => {
-      setIsSending(false);
+    } catch(err) {
       setError({ isError: true, text: err });
-    });
+    }
   }
   
   if (!article) { return null; }
@@ -183,15 +173,8 @@ const Form = ({ article, dispatch }) => {
         
       </div>
       
-      <InfoDialog 
-        text="Loading article..."
-        show={isLoading} 
-      />
-      
-      <InfoDialog 
-        text="Please wait..."
-        show={isSending} 
-      />
+      <InfoDialog text="Loading article..." show={article.isReqGet} />
+      <InfoDialog text="Please wait..." show={article.isReqPut || article.isReqDel} />
       
       <InfoDialog 
         title="Error"
@@ -214,6 +197,10 @@ const Form = ({ article, dispatch }) => {
 
 const mapStateToProps = ({ user, article, category, tag }, { id }) => {
   if (!article[id]) {
+    return { article: null }
+  }
+  
+  if (!article[id].id) {
     return { article: null }
   }
   

@@ -13,7 +13,10 @@ const Index = () => {
           <h1 className="title">Articles</h1>
         </div>
         <div className="column is-narrow">
-          <Link to="/new" className="button is-link is-small">New Article</Link>
+          <Link to="/new" className="button is-link is-small">
+            <span className="icon"><i className="fa fa-pencil-square-o"></i></span>
+            <span>New Article</span>
+          </Link>
         </div>
       </div>
       <div className="content"><hr/></div>
