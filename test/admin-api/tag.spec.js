@@ -4,17 +4,17 @@ const expect = require('expect.js');
 const app = require('../../app');
 const jwt = require('../../admin-api/jwt');
 const { server } = app;
-const { User, Tag } = app.models;
+const { User, Tag } = app.db;
 
 describe('Admin API Endpoint Test', () => {
   beforeEach(async () => {
-    await User.destroy({truncate: true});
-    await Tag.destroy({truncate: true});
+    await User.destroy({where: {}});
+    await Tag.destroy({where: {}});
   });
 
   afterEach(async () => {
-    await User.destroy({truncate: true});
-    await Tag.destroy({truncate: true});
+    await User.destroy({where: {}});
+    await Tag.destroy({where: {}});
   });
   
   describe('Tag Endpoint Test', () => {

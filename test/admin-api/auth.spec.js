@@ -3,16 +3,16 @@ const request = require('supertest');
 const expect = require('expect.js');
 const app = require('../../app');
 const { server } = app;
-const { User } = app.models;
+const { User } = app.db;
 
 describe('Admin API Endpoint Test', () => {
 
   beforeEach(async () => {
-    await User.destroy({truncate: true});
+    await User.destroy({where: {}});
   });
 
   afterEach(async () => {
-    await User.destroy({truncate: true});
+    await User.destroy({where: {}});
   });
   
   describe('Auth Endpoint Test', () => {
