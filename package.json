@@ -8,7 +8,8 @@
     "client-dev": "webpack-dev-server --config ./admin-client/webpack.dev.js",
     "build": "webpack --config ./admin-client/webpack.prod.js",
     "start": "export NODE_ENV=production && node app.js ",
-    "test": "mocha --recursive"
+    "test": "mocha --recursive",
+    "db:migrate": "sequelize db:migrate"
   },
   "author": "Fajar Dwi Darmanto",
   "license": "ISC",
@@ -22,6 +23,7 @@
     "express": "^4.17.1",
     "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
+    "mariadb": "^2.4.1",
     "pg": "^8.3.0",
     "pg-hstore": "^2.3.3",
     "reading-time": "^1.2.0",
@@ -53,6 +55,7 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "sass-loader": "^9.0.2",
+    "sequelize-cli": "^6.2.0",
     "style-loader": "^1.2.1",
     "supertest": "^4.0.2",
     "webpack": "^4.43.0",
