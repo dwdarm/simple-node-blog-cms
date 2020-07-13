@@ -1,23 +1,33 @@
 require('dotenv').config();
 
-const express = require('express');
-const server = express();
-const { Sequelize } = require('sequelize');
 
 /* init database */
-const sequelize = new Sequelize(process.env.DATABASE_URL || require('./config/db'));
+const { Sequelize } = require('sequelize');
+const cls = require('cls-hooked');
+const namespace = cls.createNamespace('database-transaction');
+Sequelize.useCLS(namespace);
+
+const sequelize = process.env.DATABASE_URL 
+  ? new Sequelize(process.env.DATABASE_URL, require('./config/db'))
+  : new Sequelize(require('./config/db'));
 const models = require('./models')(sequelize);
 sequelize.authenticate()
   .then(async () => {
-    const admin = await models.User.findOne({where: {username: 'admin'}});
-    if (!admin) {
+    const isUsersEmpty = await models.User.count();
+    if (isUsersEmpty === 0) {
       console.log('Creating admin account...');
-      await models.User.create({username: 'admin', password: 'admin'});
+      await sequelize.transaction(async () => {
+        await models.User.create({username: 'admin', password: 'admin'});
+      });
     }
   })
   .catch(err => console.error(err));
 
+
 /* init http server */
+const express = require('express');
+const server = express();
+
 server.set('trust proxy', 1);
 server.use(require('helmet')());
 server.use(require('cors')());
@@ -25,7 +35,7 @@ server.use(require('body-parser').urlencoded({ extended: false }));
 server.use(require('body-parser').json());
 
 // init routes
-server.use('/admin', require('./admin-api')(models));
+server.use('/admin', require('./admin-api')(models, sequelize));
 server.use('/client', require('./client-api')(models));
 
 // log error
