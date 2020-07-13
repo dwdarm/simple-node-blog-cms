@@ -1,6 +1,6 @@
 const express = require('express');
 
-module.exports = ({ Tag }) => {
+module.exports = ({ Tag }, sequelize) => {
   const router = express.Router();
   
   const getTagById = async (req, res, next) => {
@@ -54,7 +54,12 @@ module.exports = ({ Tag }) => {
         });
       }
       
-      const tag = await Tag.create({ title: req.body.title });
+      const tag = Tag.build({ title: req.body.title });
+      
+      await sequelize.transaction(async () => {
+        await tag.save();
+      });
+      
       res.status(201).send({ status: 'ok', data: tag });
       
     } catch(err) {
@@ -91,8 +96,10 @@ module.exports = ({ Tag }) => {
         req.tag.title = req.body.title; 
       }
       
-      await req.tag.save();
-      await req.tag.reload();
+      await sequelize.transaction(async () => {
+        await req.tag.save();
+      });
+      
       res.send({ status: 'ok', data: req.tag });
       
     } catch(err) {
@@ -106,7 +113,10 @@ module.exports = ({ Tag }) => {
   
   router.delete('/:id', getTagById, async (req, res, next) => {
     try {
-      await req.tag.destroy();
+      await sequelize.transaction(async () => {
+        await req.tag.destroy();
+      });
+      
       res.send({ status: 'ok' });
     } catch(err) {
       next(err);

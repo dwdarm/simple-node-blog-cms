@@ -1,7 +1,7 @@
 const express = require('express');
 const userRole = require('../middlewares/user-role');
 
-module.exports = ({ Category }) => {
+module.exports = ({ Category }, sequelize) => {
   const router = express.Router();
   
   const getCategoryById = async (req, res, next) => {
@@ -55,7 +55,12 @@ module.exports = ({ Category }) => {
         });
       }
       
-      const category = await Category.create({ title: req.body.title });
+      const category = Category.build({ title: req.body.title });
+      
+      await sequelize.transaction(async () => {
+        await category.save();
+      });
+      
       res.status(201).send({ status: 'ok', data: category });
       
     } catch(err) {
@@ -92,8 +97,10 @@ module.exports = ({ Category }) => {
         req.category.title = req.body.title; 
       }
       
-      await req.category.save();
-      await req.category.reload();
+      await sequelize.transaction(async () => {
+        await req.category.save();
+      });
+      
       res.send({ status: 'ok', data: req.category });
       
     } catch(err) {
@@ -107,7 +114,10 @@ module.exports = ({ Category }) => {
   
   router.delete('/:id', userRole, getCategoryById, async (req, res, next) => {
     try {
-      await req.category.destroy();
+      await sequelize.transaction(async () => {
+        await req.category.destroy();
+      });
+    
       res.send({ status: 'ok' });
     } catch(err) {
       next(err);

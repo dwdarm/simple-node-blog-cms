@@ -2,7 +2,7 @@ const express = require('express');
 const { Op } = require("sequelize");
 const DEFAULT_LIMIT = 20;
 
-module.exports = ({ Article, User, Category, Tag }) => {
+module.exports = ({ Article, User, Category, Tag }, sequelize) => {
   const router = express.Router();
   
   const getArticleById = async (req, res, next) => {
@@ -123,32 +123,36 @@ module.exports = ({ Article, User, Category, Tag }) => {
         });
       }
       
-      const article = await Article.create(data);
-      await req.loggedUser.addArticle(article);
+      const article = Article.build(data);
       
-      if (Array.isArray(categories)) {
-        const catArr = categories.filter(e => typeof e === 'number');
-        if (catArr.length > 0) {
-          const catObjs = await Category.findAll({
-            where: { id: { [Op.or]: catArr } }
-          });
-          if (catObjs.length > 0) {
-            await article.setCategories(catObjs); 
+      await sequelize.transaction(async () => {
+        await article.save();
+        await req.loggedUser.addArticle(article);
+      
+        if (Array.isArray(categories)) {
+          const catArr = categories.filter(e => typeof e === 'number');
+          if (catArr.length > 0) {
+            const catObjs = await Category.findAll({
+              where: { id: { [Op.or]: catArr } }
+            });
+            if (catObjs.length > 0) {
+              await article.setCategories(catObjs); 
+            }
           }
         }
-      }
       
-      if (Array.isArray(tags)) {
-        const tagArr = tags.filter(e => typeof e === 'number');
-        if (tagArr.length > 0) {
-          const tagObjs = await Tag.findAll({
-            where: { id: { [Op.or]: tagArr } }
-          });
-          if (tagObjs.length > 0) {
-            await article.setTags(tagObjs); 
+        if (Array.isArray(tags)) {
+          const tagArr = tags.filter(e => typeof e === 'number');
+          if (tagArr.length > 0) {
+            const tagObjs = await Tag.findAll({
+              where: { id: { [Op.or]: tagArr } }
+            });
+            if (tagObjs.length > 0) {
+              await article.setTags(tagObjs); 
+            }
           }
         }
-      }
+      });
       
       await article.reload({
         attributes: { exclude: ['UserId'] },
@@ -191,35 +195,38 @@ module.exports = ({ Article, User, Category, Tag }) => {
       if (typeof urlToHeader === 'string') { article.urlToHeader = urlToHeader; }
       if (typeof isPage === 'boolean') { article.isPage = isPage; }
       if (typeof isPublished === 'boolean') { article.isPublished = isPublished; }
-      await article.save();
       
-      if (Array.isArray(categories)) {
-        const catArr = categories.filter(e => typeof e === 'number');
-        if (catArr.length > 0) {
-          const catObjs = await Category.findAll({
-            where: { id: { [Op.or]: catArr } }
-          });
-          if (catObjs.length > 0) {
-            await article.setCategories(catObjs); 
-          }
-        } else {
-          await article.setCategories([]);
-        }
-      }
+      await sequelize.transaction(async () => {
+        await article.save();
       
-      if (Array.isArray(tags)) {
-        const tagArr = tags.filter(e => typeof e === 'number');
-        if (tagArr.length > 0) {
-          const tagObjs = await Tag.findAll({
-            where: { id: { [Op.or]: tagArr } }
-          });
-          if (tagObjs.length > 0) {
-            await article.setTags(tagObjs); 
+        if (Array.isArray(categories)) {
+          const catArr = categories.filter(e => typeof e === 'number');
+          if (catArr.length > 0) {
+            const catObjs = await Category.findAll({
+              where: { id: { [Op.or]: catArr } }
+            });
+            if (catObjs.length > 0) {
+              await article.setCategories(catObjs); 
+            }
+          } else {
+            await article.setCategories([]);
           }
-        } else {
-          await article.setTags([]);
         }
-      }
+      
+        if (Array.isArray(tags)) {
+          const tagArr = tags.filter(e => typeof e === 'number');
+          if (tagArr.length > 0) {
+            const tagObjs = await Tag.findAll({
+              where: { id: { [Op.or]: tagArr } }
+            });
+            if (tagObjs.length > 0) {
+              await article.setTags(tagObjs); 
+            }
+          } else {
+            await article.setTags([]);
+          }
+        }
+      });
       
       res.send({ status: 'ok', data: article });
       
@@ -234,7 +241,10 @@ module.exports = ({ Article, User, Category, Tag }) => {
   
   router.delete('/:id', getArticleById, isOwner, async (req, res, next) => {
     try {
-      await req.article.destroy();
+      await sequelize.transaction(async () => {
+        await req.article.destroy();
+      });
+      
       res.send({ status: 'ok' });
     } catch(err) {
       next(err);

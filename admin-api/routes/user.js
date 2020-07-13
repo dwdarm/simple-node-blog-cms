@@ -1,7 +1,7 @@
 const express = require('express');
 const DEFAULT_LIMIT = 20;
 
-module.exports = ({User}) => {
+module.exports = ({User}, sequelize) => {
   const router = express.Router();
   
   const getUserById = async (req, res, next) => {
@@ -90,7 +90,10 @@ module.exports = ({User}) => {
       if (typeof urlToAvatar === 'string') { user.urlToAvatar = urlToAvatar; }
       if (typeof about === 'string') { user.about = about; }
       if (typeof email === 'string') { user.email = email; }
-      await user.save();
+      
+      await sequelize.transaction(async () => {
+        await user.save();
+      });
       
       res.send({ status: 'ok', data: user });
       
