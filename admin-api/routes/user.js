@@ -1,16 +1,24 @@
 const express = require('express');
 const DEFAULT_LIMIT = 20;
 
-module.exports = ({User}, sequelize) => {
+module.exports = ({User, sequelize}) => {
   const router = express.Router();
   
   const getUserById = async (req, res, next) => {
-    try {
-      if (req.params.id === 'me') {
+    
+    if (req.params.id === 'me') {
         req.user = { ...req.loggedUser.toJSON(), password: undefined };
         return next();
       }
-      
+    
+    if (!parseInt(req.params.id)) {
+      return res.status(404).send({
+        status: 'error',
+        message: 'User not found'
+      });
+    }
+    
+    try {
       const user = await User.findByPk(req.params.id, {
         attributes: { exclude: ['password'] }
       });

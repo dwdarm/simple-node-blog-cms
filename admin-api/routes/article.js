@@ -2,10 +2,18 @@ const express = require('express');
 const { Op } = require("sequelize");
 const DEFAULT_LIMIT = 20;
 
-module.exports = ({ Article, User, Category, Tag }, sequelize) => {
+module.exports = ({ Article, User, Category, Tag, sequelize }) => {
   const router = express.Router();
   
   const getArticleById = async (req, res, next) => {
+    
+    if (!parseInt(req.params.id)) {
+      return res.status(404).send({
+        status: 'error',
+        message: 'Article not found'
+      });
+    }
+    
     try {
       const article = await Article.findByPk(req.params.id, {
         attributes: { exclude: ['UserId'] },

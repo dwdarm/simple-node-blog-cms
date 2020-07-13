@@ -1,9 +1,17 @@
 const express = require('express');
 
-module.exports = ({ Tag }, sequelize) => {
+module.exports = ({ Tag, sequelize}) => {
   const router = express.Router();
   
   const getTagById = async (req, res, next) => {
+    
+    if (!parseInt(req.params.id)) {
+      return res.status(404).send({
+        status: 'error',
+        message: 'Tag not found'
+      });
+    }
+    
     try {
       const tag = await Tag.findByPk(req.params.id);
       if (!tag) {

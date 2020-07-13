@@ -1,10 +1,18 @@
 const express = require('express');
 const userRole = require('../middlewares/user-role');
 
-module.exports = ({ Category }, sequelize) => {
+module.exports = ({ Category, sequelize }) => {
   const router = express.Router();
   
   const getCategoryById = async (req, res, next) => {
+    
+    if (!parseInt(req.params.id)) {
+      return res.status(404).send({
+        status: 'error',
+        message: 'Category not found'
+      });
+    }
+    
     try {
       const category = await Category.findByPk(req.params.id);
       if (!category) {
