@@ -1,23 +1,13 @@
 require('dotenv').config();
 
-
 /* init database */
-const { Sequelize } = require('sequelize');
-const cls = require('cls-hooked');
-const namespace = cls.createNamespace('database-transaction');
-Sequelize.useCLS(namespace);
-
-const sequelize = process.env.DATABASE_URL 
-  ? new Sequelize(process.env.DATABASE_URL, require('./config/db'))
-  : new Sequelize(require('./config/db'));
-const models = require('./models')(sequelize);
-sequelize.authenticate()
+const db = require('./models');
+db.sequelize.authenticate()
   .then(async () => {
-    const isUsersEmpty = await models.User.count();
-    if (isUsersEmpty === 0) {
-      console.log('Creating admin account...');
-      await sequelize.transaction(async () => {
-        await models.User.create({username: 'admin', password: 'admin'});
+    const usersCount = await db.User.count();
+    if (usersCount === 0) {
+      await db.sequelize.transaction(async () => {
+        await db.User.create({ username: 'admin', password: 'admin' });
       });
     }
   })
@@ -35,8 +25,8 @@ server.use(require('body-parser').urlencoded({ extended: false }));
 server.use(require('body-parser').json());
 
 // init routes
-server.use('/admin', require('./admin-api')(models, sequelize));
-server.use('/client', require('./client-api')(models));
+server.use('/admin', require('./admin-api')(db));
+server.use('/client', require('./client-api')(db));
 
 // log error
 server.use((err, req, res, next) => {
@@ -57,4 +47,4 @@ server.listen(process.env.PORT || 3000, err => {
   }
 });
 
-module.exports = { server, models };
+module.exports = { server, db };
