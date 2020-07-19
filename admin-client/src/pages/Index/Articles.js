@@ -16,6 +16,22 @@ const ArticleList = ({ data }) => (
               </div>
             </div>
             <div className="level-right">
+              <>
+                <div className="level-item">
+                  {e.isFeatured
+                    ? <span className="tag is-info">Featured</span>
+                    : null
+                  }
+                </div>
+              </>
+              <>
+                <div className="level-item">
+                  {e.isPage
+                    ? <span className="tag is-dark">Page</span>
+                    : null
+                  }
+                </div>
+              </>
               <div className="level-item">
                 {e.isPublished
                   ? <span className="tag is-success">Published</span>

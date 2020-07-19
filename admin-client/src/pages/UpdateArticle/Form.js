@@ -39,7 +39,11 @@ const Form = ({ article, dispatch }) => {
         .then(() => {
           setCategories(article.Categories.map(e => e.id.toString()));
           setTags(article.Tags.map(e => e.id.toString()));
-          setOptions({ isPublished: article.isPublished, isFeatured: article.isFeatured });
+          setOptions({ 
+            isPublished: article.isPublished, 
+            isFeatured: article.isFeatured,
+            isPage: article.isPage
+          });
         })
       }
     }
