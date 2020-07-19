@@ -43,8 +43,8 @@ module.exports = (sequelize, DataTypes) => {
       async beforeSave(instance) {
       
         if (instance.changed('title')) {
-          const baseSlug = slugify(instance.title);
-          let slug = baseSlug + '-' + cryptoRandomString({length:4})
+          const baseSlug = slugify(instance.title.toLowerCase());
+          let slug = baseSlug;
           let isSlugExist = await this.findOne({where:{slug}});
           while(isSlugExist) {
             slug = baseSlug + '-' + cryptoRandomString({length:4});
