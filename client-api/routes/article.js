@@ -49,10 +49,10 @@ module.exports = ({ Article, User, Category, Tag }) => {
       query.limit = parseInt(req.query.limit) || DEFAULT_LIMIT;
       query.offset = ((parseInt(req.query.page) || 1) - 1) * query.limit;
       
-      query.where = { isPublished: true }
+      query.where = { isPublished: true, isPage: false }
       if (typeof req.query.userId === 'string') { query.where.userId = req.query.userId; }
-      if (req.query.isPage) { where.isPage = true; }
-      if (req.query.isFeatured) { where.isFeatured = true; }
+      if (req.query.isPage) { query.where.isPage = true; }
+      if (req.query.isFeatured) { query.where.isFeatured = true; }
       
       query.order = []
       if (req.query.sort === 'title_asc') { query.order.push(['title', 'ASC']); } 
