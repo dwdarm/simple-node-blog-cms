@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ isPublished, isFeatured, onOptionsChange, onSave }) => {
+export default ({ isPublished, isFeatured, isPage, onOptionsChange, onSave }) => {
   return (
     <div className="panel">
       <p className="panel-heading is-size-6">Options</p>
@@ -13,6 +13,16 @@ export default ({ isPublished, isFeatured, onOptionsChange, onSave }) => {
           onChange={onOptionsChange}
         />
         Published
+      </label>
+      
+      <label className="panel-block">
+        <input 
+          type="checkbox" 
+          name="isPage"
+          checked={isPage}
+          onChange={onOptionsChange}
+        />
+        Page
       </label>
       
       <label className="panel-block">

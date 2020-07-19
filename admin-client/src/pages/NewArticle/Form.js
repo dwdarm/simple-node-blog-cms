@@ -14,7 +14,9 @@ const Form = ({ dispatch }) => {
   const contentRef = useRef(null);
   const [ categories, setCategories ] = useState([]);
   const [ tags, setTags ] = useState([]);
-  const [ options, setOptions ] = useState({ isPublished: false, isFeatured: false });
+  const [ options, setOptions ] = useState({ 
+    isPublished: false, isFeatured: false, isPage: false 
+  });
   const [ isSending, setIsSending ] = useState(false);
   const [ error, setError ] = useState({ isError: false, text: '' });
   const history = useHistory();
