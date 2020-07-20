@@ -6,9 +6,17 @@ import { getCategories } from '../../store/actions/category.action';
 import { getTags } from '../../store/actions/tag.action';
 
 const Options = ({ 
-  categories, tags, isFetching, dispatch, 
-  selectedStatus, selectedCategory, selectedTag, selectedSort 
-  }) => {
+  categories, 
+  tags, 
+  isFetching, 
+  dispatch, 
+  selectedStatus, 
+  selectedCategory, 
+  selectedTag, 
+  selectedSort,
+  selectedIsPage, 
+  selectedIsFeatured
+}) => {
     
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -79,7 +87,9 @@ const mapStateToProps = ({ article, articleList, category, tag }) => {
     selectedCategory: articleList.category,
     selectedTag: articleList.tag,
     selectedSort: articleList.sort,
-    isFetching: article.isFetching
+    selectedIsPage: articleList.selectedIsPage,
+    selectedIsFeatured: articleList.selectedIsFeatured,
+    isFetching: articleList.isFetching
   }
 }
 

@@ -43,12 +43,19 @@ const Login = ({ isAuthenticated, isReqGet, isReqPost, dispatch }) => {
           </div>
           <div className="field">
             <div className="control">
-              <button 
-                className="button is-link"
-                disabled={isReqGet || isReqPost ? true : undefined} 
-                onClick={handleLogin}>
-                Login
-              </button>
+              <div className="columns is-mobile is-vcentered">
+                <div className="column is-narrow">
+                  <button 
+                    className="button is-link"
+                    disabled={isReqGet || isReqPost ? true : undefined} 
+                    onClick={handleLogin}>
+                    Login
+                  </button>
+                </div>
+                <div className="column is-narrow">
+                  <a href="/forgot-password">Forgot password?</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

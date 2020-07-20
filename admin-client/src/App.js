@@ -18,7 +18,7 @@ export default class App extends React.Component {
     return (
       <Provider store={store}>
         <Auth>
-          <BrowserRouter basename="/admin">
+          <BrowserRouter>
             <Switch>
               <Route path="/article-edit/:id"><UpdateArticle/></Route>
               <Route path="/new"><NewArticle/></Route>

@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       models.User.hasMany(models.Article);
+      models.User.hasOne(models.PasswordToken);
     }
   };
   User.init({

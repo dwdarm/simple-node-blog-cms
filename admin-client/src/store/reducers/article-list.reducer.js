@@ -7,7 +7,9 @@ const defaultState = {
   status: 'all',
   category: 'all',
   tag: 'all',
-  sort: 'updated_desc'
+  sort: 'updated_desc',
+  isPage: '',
+  isFeatured: ''
 }
 
 export default (state = { ...defaultState }, { type, payload }) => {
@@ -28,7 +30,9 @@ export default (state = { ...defaultState }, { type, payload }) => {
         status: payload.status || state.status,
         category: payload.category || state.category,
         tag: payload.tag || state.tag,
-        sort: payload.sort || state.sort
+        sort: payload.sort || state.sort,
+        isPage: payload.isPage || state.isPage,
+        isFeatured: payload.isFeatured || state.isFeatured
       }
     case 'REQUEST_ARTICLE_LIST':
       return { ...state, isFetching: true }

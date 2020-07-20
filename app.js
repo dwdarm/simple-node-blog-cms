@@ -1,4 +1,7 @@
 require('dotenv').config();
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config/config.js')[env];
+const path = require('path');
 
 /* init database */
 const db = require('./models');
@@ -17,16 +20,29 @@ db.sequelize.authenticate()
 /* init http server */
 const express = require('express');
 const server = express();
+const mail = require('./mail');
 
 server.set('trust proxy', 1);
+server.set('view engine', 'ejs');
 server.use(require('helmet')());
 server.use(require('cors')());
 server.use(require('body-parser').urlencoded({ extended: false }));
 server.use(require('body-parser').json());
 
 // init routes
-server.use('/admin', require('./admin-api')(db));
+server.use('/admin', require('./admin-api')(db, mail, config));
 server.use('/client', require('./client-api')(db));
+
+// server static
+server.use(express.static(path.join(__dirname, './admin-client/dist'), {index:false}));
+server.use(express.static(path.join(__dirname, './public'), {index:false}));
+server.use('/', require('./internal')(db, mail, config));
+
+server.get('*', (req, res) => {
+  res.sendFile('index.html', {
+    root: path.join(__dirname, './admin-client/dist')
+  });
+});
 
 // log error
 server.use((err, req, res, next) => {
@@ -38,8 +54,6 @@ server.use((err, req, res, next) => {
 });
 
 server.use((err, req, res, next) => res.sendStatus(500));
-
-server.get('*', (req, res) => res.sendStatus(404));
 
 server.listen(process.env.PORT || 3000, err => {
   if (err) {

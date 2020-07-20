@@ -1,8 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 const jwt = require('../jwt');
 
-module.exports = ({User}) => {
+module.exports = ({ User, PasswordToken }, mail, config) => {
   const router = express.Router();
   
   router.post('/', async (req, res, next) => {

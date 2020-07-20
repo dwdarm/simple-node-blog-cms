@@ -27,10 +27,6 @@ module.exports = merge(common, {
     proxy: {
       '/admin/api': 'http://localhost:3000'
     },
-    historyApiFallback: {
-      rewrites: [
-        { from: /^\/admin\/.*$/, to: '/index.html'}
-      ]
-    }
+    historyApiFallback: true
   }
 });

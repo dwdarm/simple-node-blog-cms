@@ -44,7 +44,12 @@ export const getArticleList = (token) => async (dispatch, getState) => {
   
   dispatch(requestArticleList());
   
-  const query = { page: state.articleList.page }
+  const query = { 
+    page: state.articleList.page,
+    isPage:  state.articleList.isPage,
+    isFeatured:  state.articleList.isFeatured
+  }
+  
   if (state.articleList.userId !== 'all') { query.userId = state.articleList.userId }
   if (state.articleList.status !== 'all') { query.status = state.articleList.status }
   if (state.articleList.category !== 'all') { query.categoryId = state.articleList.category }

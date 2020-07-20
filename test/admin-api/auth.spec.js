@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 const request = require('supertest');
 const expect = require('expect.js');
+const { v4: uuidv4 } = require('uuid');
 const app = require('../../app');
 const { server } = app;
 const { User } = app.db;
@@ -18,10 +19,10 @@ describe('Admin API Endpoint Test', () => {
   describe('Auth Endpoint Test', () => {
     
     /**
-     * /POST /client/api/auth
+     * /POST /admin/api/auth
      */
      
-    describe('/PUT /admin/api/auth', () => {
+    describe('/POST /admin/api/auth', () => {
       it('It should get a token', async () => {
         const user = await User.create({username: 'alpha', password: '12345678'});
         const res = await request(server)
