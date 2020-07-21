@@ -1,18 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const csrf = require('csurf');
+const { csrfProtection, trimCsrf } = require('../middlewares/csrf');
 
 module.exports = ({ User, PasswordToken }, mail, config) => {
   const router = express.Router();
-  const csrfProtection = csrf({ cookie: true })
-  
-  const trimCsrf = (req, res, next) => {
-    if (typeof req.body._csrf === 'string') {
-      req.body._csrf = req.body._csrf.trim();
-    }
-    
-    next();
-  }
   
   router.get('/:id/:token', csrfProtection, async (req, res, next) => {
     try {
