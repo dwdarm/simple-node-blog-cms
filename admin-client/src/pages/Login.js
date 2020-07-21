@@ -1,10 +1,18 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { login, getLoggedUser } from '../store/actions/auth.action';
 
 const Login = ({ isAuthenticated, isReqGet, isReqPost, dispatch }) => {
   const usernameRef = useRef(null);
   const passwordRef = useRef(null);
+  const history = useHistory();
+  
+  useEffect(() => {
+    if (isAuthenticated === true) {
+      history.replace('/');
+    }
+  });
   
   const handleLogin = async () => {
     try {
