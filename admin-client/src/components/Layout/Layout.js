@@ -7,7 +7,7 @@ export default ({children}) => (
       <SideBar/>
     </div>
     <div className="column">
-      <div className="container" style={{padding:'0.75rem 1.25rem'}}>
+      <div className="container px-5 py-5">
         {children}
       </div>
     </div>

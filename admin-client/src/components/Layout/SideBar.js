@@ -11,7 +11,7 @@ export default () => {
   }
   
   return (
-    <div>
+    <div className="pb-2">
       <div style={{padding:'0.75rem'}}>
         <p className="title is-6">Dashboard</p>
       </div>
