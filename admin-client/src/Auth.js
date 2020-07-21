@@ -1,29 +1,42 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import Loader from 'react-loader-spinner';
 import { getLoggedUser } from './store/actions/auth.action';
-import Login from './pages/Login';
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
 
-const Auth = ({ isAuthenticated, dispatch, children }) => {
+const Loading = () => (
+  <div 
+    className="columns is-centered is-vcentered is-mobile" 
+    style={{minHeight:'100vh'}}>
+    <div className="column is-narrow">
+      <Loader type="Bars" color="#363636" height={80} width={80} />
+    </div>
+  </div>
+);
+
+const Auth = ({ dispatch, children }) => {
+  const [ fetched, setFetched ] = useState(false);
   
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      dispatch(getLoggedUser(token));
+    if (!fetched) {
+      dispatch(getLoggedUser(localStorage.getItem('token')))
+      .finally(() => setFetched(true));
     }
   });
   
-  return (
-    <>
-      { !isAuthenticated 
-        ? <Login />
-        : <>{children}</>
-      }
-    </>
-  );
+  if (!fetched) {
+    return <Loading/>;
+  }
+  
+  return <>{children}</>
 }
 
-const mapStateToProps = ({ auth }) => ({
-  isAuthenticated: auth.isAuthenticated
-});
+const mapStateToProps = ({ auth }) => {
+  return {
+    isAuthenticated: auth.isAuthenticated,
+    isReqGet: auth.isReqGet,
+    isReqPost: auth.isReqPost
+  }
+}
 
 export default connect(mapStateToProps)(Auth);
