@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "export NODE_ENV=development && nodemon app.js",
-    "client-dev": "webpack-dev-server --config ./admin-client/webpack.dev.js",
-    "build": "webpack --config ./admin-client/webpack.prod.js",
+    "dev:client": "webpack-dev-server --config ./admin-client/webpack.dev.js",
+    "build:client": "webpack --config ./admin-client/webpack.prod.js",
+    "build": "npm run build:client",
     "start": "export NODE_ENV=production && node app.js ",
     "test": "mocha --recursive",
-    "db:migrate": "sequelize db:migrate"
+    "migrate": "sequelize db:migrate"
   },
   "author": "Fajar Dwi Darmanto",
   "license": "ISC",
@@ -54,6 +55,7 @@
     "nodemon": "^2.0.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-loader-spinner": "^3.1.14",
     "react-markdown": "^4.3.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
