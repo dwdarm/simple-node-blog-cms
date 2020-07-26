@@ -1,4 +1,5 @@
 const sendNotFoundError = (res) => {
+  console.log('LOG')
   res.status(404).send({
     status: 'error',
     message: 'Resource not found'

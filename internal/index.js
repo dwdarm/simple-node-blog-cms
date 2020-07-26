@@ -1,39 +1,40 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
-const server = require('./server');
-const db = require('./db');
-const mail = require('./mail');
-const env = process.env.NODE_ENV || 'development';
-const config = require('../app/config/config.js')[env];
-const middlewaresDir = path.join(__dirname, '../app/middlewares');
-const controllersDir = path.join(__dirname, '../app/controllers');
-const routesDir = path.join(__dirname, '../app/routes');
-const data = { db, mail, config, server, router: server }
+const Server = require('./server');
+const DB = require('./db');
 
-const initComponent = ({ data, dir }) => {
-  const results = {};
-  fs
-    .readdirSync(dir)
-    .filter(file => (file.indexOf('.') !== 0) && (file.slice(-3) === '.js'))
-    .forEach(file => {
-      const component = require(path.join(dir, file));
-      results[component.name] = component(data);
+const path = require('path');
+const MIDDLEWARES_DIR = path.join(__dirname, '../app/http/middlewares');
+const CONTROLLERS_DIR = path.join(__dirname, '../app/http/controllers');
+
+const MIDDLEWARE_EXT = '.middleware.js';
+const CONTROLLER_EXT = '.controller.js';
+
+module.exports = { 
+  init: () => {
+    const db = DB.init();
+    
+    const middlewares = {}
+    fs.readdirSync(MIDDLEWARES_DIR)
+    .filter(file => (file.indexOf('.') !== 0) && (file.slice(MIDDLEWARE_EXT.length*-1) === MIDDLEWARE_EXT))
+    .forEach((file) => {
+      const middleware = require(path.join(MIDDLEWARES_DIR, file));
+      middlewares[middleware.name] = middleware(db);
     });
     
-  return results;
+    const controllers = {}
+    fs.readdirSync(CONTROLLERS_DIR)
+    .filter(file => (file.indexOf('.') !== 0) && (file.slice(CONTROLLER_EXT.length*-1) === CONTROLLER_EXT))
+    .forEach((file) => {
+      const controller = require(path.join(CONTROLLERS_DIR, file));
+      controllers[controller.name] = controller(db);
+    });
+    
+    const server = Server.init({ controllers, middlewares });
+    
+    return { db, server }
+  }
 }
-
-data.middlewares = initComponent({ data, dir: middlewaresDir });
-data.controllers = initComponent({ data, dir: controllersDir });
-
-require('../app/config/middlewares')(data);
-
-initComponent({ data, dir: routesDir });
-
-require('../app/config/error')(data);
-
-module.exports = data;
 
 

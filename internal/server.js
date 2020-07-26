@@ -1,4 +1,13 @@
 const express = require('express');
-const server = express();
+const Routes = require('../app/config/routes');
 
-module.exports = server;
+module.exports = {
+  init: (data) => {
+    const server = express();
+    Routes.init(server, data);
+  
+    return server;
+  }
+}
+
+

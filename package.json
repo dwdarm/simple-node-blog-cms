@@ -10,10 +10,8 @@
     "build": "npm run build:client",
     "start": "export NODE_ENV=production && node index.js ",
     "migrate": "sequelize db:migrate",
-    "test:internal:unit": "mocha --recursive ./test/internal/integration",
-    "test:internal:integration": "mocha --recursive ./test/internal/integration",
-    "test:app:unit": "mocha --recursive ./test/app/integration",
-    "test:app:integration": "mocha --recursive ./test/app/integration"
+    "test:unit": "export NODE_ENV=test && mocha --recursive ./internal/**/*.spec.js ./app/**/*.spec.js",
+    "test:integration": "export DB_LOG=false && export NODE_ENV=test && mocha --recursive ./tests"
   },
   "author": "Fajar Dwi Darmanto",
   "license": "ISC",
@@ -67,6 +65,7 @@
     "redux-thunk": "^2.3.0",
     "sass-loader": "^9.0.2",
     "sequelize-cli": "^6.2.0",
+    "sinon": "^9.0.2",
     "style-loader": "^1.2.1",
     "supertest": "^4.0.2",
     "webpack": "^4.43.0",

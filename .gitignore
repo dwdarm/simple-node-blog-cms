@@ -1,12 +1,7 @@
-# dependency
 node_modules
 
-# misc
-.env
-.database.sqlite
-admin-client/dist
-app/public/index.html
-app/public/bundle.js
+mydatabase
+mydatabase_dev
+mydatabase_test
 
-#log
-npm-debug.log
+.env

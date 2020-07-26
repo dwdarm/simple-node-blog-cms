@@ -1,8 +1,10 @@
 require('dotenv').config();
 
-const internal = require('./internal');
+const internal = require('./internal').init();
 
-internal.server.listen(process.env.PORT || 3000, err => {
+internal.db.sequelize.authenticate().catch(err => console.error(err));
+
+internal.server.listen(process.env.APP_PORT || process.env.PORT || 3000, err => {
   if (err) {
     return console.error(err);
   }
