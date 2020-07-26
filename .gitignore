@@ -1,0 +1,7 @@
+node_modules
+
+mydatabase
+mydatabase_dev
+mydatabase_test
+
+.env

@@ -1,0 +1,46 @@
+.md-editor {
+  background-color: hsl(0, 0%, 98%);
+  border: 1px solid hsl(0, 0%, 71%);
+  
+  textarea {
+    background-color: white;
+    box-sizing: border-box;
+    width:100%;
+    padding: 0.5rem;
+    resize: vertical;
+    border: none;
+  }
+  
+  .md-editor-btn-wrapper {
+    padding: 0.5rem;
+    border-bottom: 1px solid hsl(0, 0%, 71%);
+    
+    button {
+      cursor: pointer;
+      padding: 0.5rem;
+      box-sizing: border-box;
+      background-color: hsl(0, 0%, 98%);
+      border: none;
+      outline: none;
+    }
+    
+    button::-moz-focus-inner {
+      border: none;
+    }
+    
+    button.md-is-active {
+      border: 1px solid hsl(0, 0%, 71%);
+    }
+    
+  }
+  
+  .md-editor-preview {
+    background-color: white;
+    padding: 0.5rem;
+  }
+
+  .md-is-hidden {
+    display: none;
+  }
+  
+}
