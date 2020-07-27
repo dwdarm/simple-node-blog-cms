@@ -1,3 +1,3 @@
-# headless-blog
+# simple-node-blog-cms
 
 ## Under Development
