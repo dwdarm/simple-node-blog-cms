@@ -17,6 +17,7 @@ import PromptDialog from '../../components/PromptDialog';
 const Form = ({ article, dispatch }) => {
   const titleRef = useRef(null);
   const headerRef = useRef(null);
+  const descRef = useRef(null);
   const contentRef = useRef(null);
   const [ categories, setCategories ] = useState([]);
   const [ tags, setTags ] = useState([]);
@@ -86,6 +87,7 @@ const Form = ({ article, dispatch }) => {
       await dispatch(updateArticle(article.id, {
         title: titleRef.current.value,
         urlToHeader: headerRef.current.value,
+        description: descRef.current.value,
         content: contentRef.current.value,
         categories: categories.map(e => parseInt(e)),
         tags: tags.map(e => parseInt(e)),
@@ -137,6 +139,18 @@ const Form = ({ article, dispatch }) => {
                 placeholder="Url to header"
                 defaultValue={article.urlToHeader}
               />
+            </div>
+          </div>
+          <div className="field">
+            <label className="label">Description</label>
+            <div className="control">
+              <input 
+                ref={descRef} 
+                className="input" 
+                type="text" 
+                placeholder="Description"
+                defaultValue={article.description}
+                />
             </div>
           </div>
           <div className="field">

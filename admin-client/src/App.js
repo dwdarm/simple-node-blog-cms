@@ -20,7 +20,7 @@ export default class App extends React.Component {
     return (
       <Provider store={store}>
         <Auth>
-          <BrowserRouter>
+          <BrowserRouter basename="/admin">
             <Switch>
               <AuthRoute path="/article-edit/:id"><UpdateArticle/></AuthRoute>
               <AuthRoute path="/new"><NewArticle/></AuthRoute>

@@ -7,7 +7,7 @@ export default () => {
   const signOut = e => {
     e.preventDefault();
     localStorage.removeItem('token');
-    location.replace('/');
+    location.replace('/admin');
   }
   
   return (

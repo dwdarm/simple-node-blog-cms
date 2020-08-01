@@ -11,6 +11,7 @@ import InfoDialog from '../../components/InfoDialog';
 const Form = ({ dispatch }) => {
   const titleRef = useRef(null);
   const headerRef = useRef(null);
+  const descRef = useRef(null);
   const contentRef = useRef(null);
   const [ categories, setCategories ] = useState([]);
   const [ tags, setTags ] = useState([]);
@@ -58,6 +59,7 @@ const Form = ({ dispatch }) => {
     dispatch(postArticle({
       title: titleRef.current.value,
       urlToHeader: headerRef.current.value,
+      description: descRef.current.value,
       content: contentRef.current.value,
       categories: categories.map(e => parseInt(e)),
       tags: tags.map(e => parseInt(e)),
@@ -88,6 +90,12 @@ const Form = ({ dispatch }) => {
             <label className="label">Header</label>
             <div className="control">
               <input ref={headerRef} className="input" type="text" placeholder="Url to header"/>
+            </div>
+          </div>
+          <div className="field">
+            <label className="label">Description</label>
+            <div className="control">
+              <input ref={descRef} className="input" type="text" placeholder="Description"/>
             </div>
           </div>
           <div className="field">
