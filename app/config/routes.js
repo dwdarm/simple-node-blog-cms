@@ -18,7 +18,8 @@ module.exports = {
       CategoryController,
       TagController,
       AuthController,
-      PasswordController
+      PasswordController,
+      SiteController
     } = controllers;
     
     //server.set('trust proxy', 1);
@@ -30,6 +31,7 @@ module.exports = {
     server.use(require('body-parser').urlencoded({ extended: false }));
     server.use(require('body-parser').json());
     server.use(require('cookie-parser')());
+    server.use(express.static(path.join(__dirname, '../public'), {index:false}));
     
     const UserMiddleware = ResourceMiddleware('User');
     const ArticleMiddleware = ResourceMiddleware('Article');
@@ -70,6 +72,17 @@ module.exports = {
     server.get('/admin/api/*', (req, res) => res.sendStatus(404));
     server.get('/admin/api', (req, res) => res.sendStatus(404));
     
+    server.get('/admin', (req, res) => {
+      res.sendFile('index.html', {
+        root: path.join(__dirname, '../public/admin')
+      });
+    });
+    
+    server.get('/admin/*', (req, res) => {
+      res.sendFile('index.html', {
+        root: path.join(__dirname, '../public/admin')
+      });
+    });
     
     // Client API
     server.get('/client/api/users', UserController.getAll);
@@ -119,14 +132,9 @@ module.exports = {
       PasswordController.postResetPassword
     );
     
-    // static
-    server.use(express.static(path.join(__dirname, '../public'), {index:false}));
     
-    server.get('*', (req, res) => {
-      res.sendFile('index.html', {
-        root: path.join(__dirname, '../public')
-      });
-    });
+    // site 
+    server.get('/', SiteController.index);
   
     // log error
     server.use((err, req, res, next) => {
