@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
         case 'published_asc':
           query.order.push(['publishedAt', 'ASC']);
           break;
-        case 'published_asc':
+        case 'published_desc':
           query.order.push(['publishedAt', 'DESC']);
           break;
         case 'updated_asc':
@@ -120,6 +120,7 @@ module.exports = (sequelize, DataTypes) => {
     static async createNew(data = {}) {
       const { 
         title, 
+        description,
         content, 
         urlToHeader, 
         isPage, 
@@ -132,6 +133,10 @@ module.exports = (sequelize, DataTypes) => {
       
       if (typeof title === 'string') { 
         parameters.title = title.trim(); 
+      }
+      
+      if (typeof description === 'string') { 
+        parameters.description = description; 
       }
       
       if (typeof content === 'string') { 
@@ -163,6 +168,7 @@ module.exports = (sequelize, DataTypes) => {
     async change(data = {}) {
       const { 
         title, 
+        description,
         content, 
         urlToHeader, 
         isPage, 
@@ -173,6 +179,10 @@ module.exports = (sequelize, DataTypes) => {
       
       if (typeof title === 'string' && title.length > 0) { 
         this.title = title; 
+      }
+      
+      if (typeof description === 'string') { 
+        this.description = description; 
       }
       
       if (typeof content === 'string') { 
@@ -239,6 +249,7 @@ module.exports = (sequelize, DataTypes) => {
         updatedAt: this.updatedAt,
         publishedAt: this.publishedAt,
         urlToHeader: this.urlToHeader,
+        description: this.description,
         content: this.content,
         isPage: this.isPage,
         isPublished: this.isPublished,
@@ -268,6 +279,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     slug: DataTypes.STRING,
     urlToHeader: DataTypes.STRING,
+    description: DataTypes.STRING,
     content: DataTypes.TEXT,
     isPage: {
       type: DataTypes.BOOLEAN,
