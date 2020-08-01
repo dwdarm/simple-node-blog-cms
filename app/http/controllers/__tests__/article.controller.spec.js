@@ -1,6 +1,5 @@
 const expect = require('expect.js');
 const sinon = require('sinon');
-const errorResponse = require('../../../utils/error-response');
 const ArticleController = require('../article.controller');
 
 describe('ArticleController test', () => {
@@ -26,7 +25,7 @@ describe('ArticleController test', () => {
       sinon.restore();
     });
     
-    it('it should call res.send with req.loggedUser is undefined', async () => {
+    it('it should send only published article when logged user is undefined', async () => {
       const Article = { getAll: sinon.fake.resolves({ count: 0, rows: [] }) }
       const req = { query: {} }
       const res = { send: sinon.fake() }
@@ -34,24 +33,20 @@ describe('ArticleController test', () => {
       
       await ArticleController({Article}).getAll(req, res, next);
       
-      expect(next.called).to.be.equal(false);
-      expect(Article.getAll.calledOnce).to.be.equal(true);
       expect(Article.getAll.calledWith({status:'published'})).to.be.equal(true);
       expect(res.send.calledOnce).to.be.equal(true);
       expect(res.send.calledWith({ status: 'ok', total: 0, data: [] })).to.be.equal(true);
     });
     
-    it('it should call res.send with req.loggedUser is NOT undefined', async () => {
+    it('it should send all article with when logged user is undefined', async () => {
       const Article = { getAll: sinon.fake.resolves({ count: 0, rows: [] }) }
-      const req = { query: {status:'draft'}, loggedUser: {id:1} }
+      const req = { query: {}, loggedUser: {id:1} }
       const res = { send: sinon.fake() }
       const next = sinon.fake();
       
       await ArticleController({Article}).getAll(req, res, next);
       
-      expect(next.called).to.be.equal(false);
-      expect(Article.getAll.calledOnce).to.be.equal(true);
-      expect(Article.getAll.calledWith({status:'draft'})).to.be.equal(true);
+      expect(Article.getAll.calledWith({status:'published'})).to.be.equal(false);
       expect(res.send.calledOnce).to.be.equal(true);
       expect(res.send.calledWith({ status: 'ok', total: 0, data: [] })).to.be.equal(true);
     });
@@ -68,14 +63,13 @@ describe('ArticleController test', () => {
       sinon.restore();
     });
     
-    it('it should call res.send', async () => {
+    it('it should send an article', async () => {
       const req = { article: { id: 1, toJSON: () => ({id:1}) } }
       const res = { send: sinon.fake() }
       const next = sinon.fake();
       
       await ArticleController({}).getById(req, res, next);
       
-      expect(next.called).to.be.equal(false);
       expect(res.send.called).to.be.equal(true);
       expect(res.send.calledWith({ status: 'ok', data: {id:1} })).to.be.equal(true);
     });
@@ -92,30 +86,24 @@ describe('ArticleController test', () => {
       sinon.restore();
     });
     
-    it('it should call sendNotFoundError if article is not found', async () => {
-      const sendNotFoundError = sinon.stub(errorResponse, 'sendNotFoundError');
+    it('it should send status 404 if article is not found', async () => {
       const Article = {
         getBySlug: sinon.fake.resolves(null)
       }
       const req = {
         params: { slug: 'foo' }
       }
-      const res = {
-        send: sinon.fake()
-      }
+      const res = {}
+      res.status = sinon.fake.returns(res);
+      res.send = sinon.fake.returns(res);
       const next = sinon.fake();
       
       await ArticleController({Article}).getBySlug(req, res, next);
-      expect(next.called).to.be.equal(false);
-      expect(Article.getBySlug.called).to.be.equal(true);
-      expect(Article.getBySlug.calledWith('foo')).to.be.equal(true);
-      expect(sendNotFoundError.calledOnce).to.be.equal(true);
-      expect(sendNotFoundError.calledWith(res)).to.be.equal(true);
-      expect(res.send.called).to.be.equal(false);
+      expect(res.status.calledWith(404)).to.be.equal(true);
+      expect(res.send.calledOnce).to.be.equal(true);
     });
     
-    it('it should call res.send', async () => {
-      const sendNotFoundError = sinon.stub(errorResponse, 'sendNotFoundError');
+    it('it should send an article', async () => {
       const Article = {
         getBySlug: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
       }
@@ -128,15 +116,7 @@ describe('ArticleController test', () => {
       const next = sinon.fake();
       
       await ArticleController({Article}).getBySlug(req, res, next);
-      expect(next.called).to.be.equal(false);
-      expect(Article.getBySlug.called).to.be.equal(true);
-      expect(Article.getBySlug.calledWith('foo')).to.be.equal(true);
-      expect(sendNotFoundError.called).to.be.equal(false);
-      expect(res.send.called).to.be.equal(true);
-      expect(res.send.calledWith({ 
-        status: 'ok', 
-        data: {id:1} 
-      })).to.be.equal(true);
+      expect(res.send.calledWith({ status: 'ok', data: {id:1} })).to.be.equal(true);
     });
     
   });
@@ -151,108 +131,49 @@ describe('ArticleController test', () => {
       sinon.restore();
     });
     
-    it('it should call sendBadRequestError if req.body.title is undefined', async () => {
-      const resp = sinon.fake();
-      const sendBadRequestError = sinon.stub(errorResponse, 'sendBadRequestError').returns(resp);
-      const Article = {
-        createNew: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) }),
-        getById: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
-      }
-      const sequelize = {
-        transaction: (cb) => {
-          cb();
-        }
-      }
+    it('it should send status 400 if title is undefined', async () => {
       const req = {
-        loggedUser: {
-          addArticle: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
-        },
         body: {}
       }
-      const res = {
-        send: sinon.fake()
-      }
+      const res = {}
+      res.status = sinon.fake.returns(res);
+      res.send = sinon.fake.returns(res);
       const next = sinon.fake();
       
-      await ArticleController({Article, sequelize}).create(req, res, next);
-      expect(next.called).to.be.equal(false);
-      expect(sendBadRequestError.called).to.be.equal(true);
-      expect(sendBadRequestError.calledWith('Title not found')).to.be.equal(true);
-      expect(Article.createNew.called).to.be.equal(false);
-      expect(req.loggedUser.addArticle.called).to.be.equal(false);
-      expect(Article.getById.called).to.be.equal(false);
-      expect(res.send.called).to.be.equal(false);
+      await ArticleController({}).create(req, res, next);
+      expect(res.status.calledWith(400)).to.be.equal(true);
+      expect(res.send.calledOnce).to.be.equal(true);
     });
     
-    it('it should call sendBadRequestError if req.body.title is not a string', async () => {
-      const resp = sinon.fake();
-      const sendBadRequestError = sinon.stub(errorResponse, 'sendBadRequestError').returns(resp);
-      const Article = {
-        createNew: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) }),
-        getById: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
-      }
-      const sequelize = {
-        transaction: (cb) => {
-          cb();
-        }
-      }
+    it('it should send status 400 if title is not a string', async () => {
       const req = {
-        loggedUser: {
-          addArticle: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
-        },
         body: { title: 123 }
       }
-      const res = {
-        send: sinon.fake()
-      }
+      const res = {}
+      res.status = sinon.fake.returns(res);
+      res.send = sinon.fake.returns(res);
       const next = sinon.fake();
       
-      await ArticleController({Article, sequelize}).create(req, res, next);
-      expect(next.called).to.be.equal(false);
-      expect(sendBadRequestError.called).to.be.equal(true);
-      expect(sendBadRequestError.calledWith('Title not found')).to.be.equal(true);
-      expect(Article.createNew.called).to.be.equal(false);
-      expect(req.loggedUser.addArticle.called).to.be.equal(false);
-      expect(Article.getById.called).to.be.equal(false);
-      expect(res.send.called).to.be.equal(false);
+      await ArticleController({}).create(req, res, next);
+      expect(res.status.calledWith(400)).to.be.equal(true);
+      expect(res.send.calledOnce).to.be.equal(true);
     });
     
-    it('it should call sendBadRequestError if req.body.title is an empty string', async () => {
-      const resp = sinon.fake();
-      const sendBadRequestError = sinon.stub(errorResponse, 'sendBadRequestError').returns(resp);
-      const Article = {
-        createNew: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) }),
-        getById: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
-      }
-      const sequelize = {
-        transaction: (cb) => {
-          cb();
-        }
-      }
+    it('it should send status 400 if title is an empty string', async () => {
       const req = {
-        loggedUser: {
-          addArticle: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
-        },
         body: { title: '' }
       }
-      const res = {
-        send: sinon.fake()
-      }
+      const res = {}
+      res.status = sinon.fake.returns(res);
+      res.send = sinon.fake.returns(res);
       const next = sinon.fake();
       
-      await ArticleController({Article, sequelize}).create(req, res, next);
-      expect(next.called).to.be.equal(false);
-      expect(sendBadRequestError.called).to.be.equal(true);
-      expect(sendBadRequestError.calledWith('Title not found')).to.be.equal(true);
-      expect(Article.createNew.called).to.be.equal(false);
-      expect(req.loggedUser.addArticle.called).to.be.equal(false);
-      expect(Article.getById.called).to.be.equal(false);
-      expect(res.send.called).to.be.equal(false);
+      await ArticleController({}).create(req, res, next);
+      expect(res.status.calledWith(400)).to.be.equal(true);
+      expect(res.send.calledOnce).to.be.equal(true);
     });
     
-    it('it should call res.send', async () => {
-      const resp = sinon.fake();
-      const sendBadRequestError = sinon.stub(errorResponse, 'sendBadRequestError').returns(resp);
+    it('it should create an article', async () => {
       const Article = {
         createNew: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) }),
         getById: sinon.fake.resolves({id:1, toJSON: () => ({id:1}) })
@@ -271,18 +192,13 @@ describe('ArticleController test', () => {
       const res = {}
       res.status = sinon.fake.returns(res);
       res.send = sinon.fake.returns(res);
-      
       const next = sinon.fake();
       
       await ArticleController({Article, sequelize}).create(req, res, next);
-      expect(next.called).to.be.equal(false);
-      expect(sendBadRequestError.called).to.be.equal(false);
-      expect(Article.createNew.calledOnce).to.be.equal(true);
       expect(Article.createNew.calledWith({ title: 'title' })).to.be.equal(true);
       expect(req.loggedUser.addArticle.calledOnce).to.be.equal(true);
-      expect(Article.getById.calledOnce).to.be.equal(true);
-      expect(res.status.calledOnce).to.be.equal(true);
-      expect(res.send.calledOnce).to.be.equal(true);
+      expect(res.status.calledWith(201)).to.be.equal(true);
+      expect(res.send.calledWith({ status: 'ok', data: {id:1} })).to.be.equal(true);
     });
     
   });
@@ -297,7 +213,7 @@ describe('ArticleController test', () => {
       sinon.restore();
     });
     
-    it('it should call res.send', async () => {
+    it('it should update an article', async () => {
       const sequelize = {
         transaction: cb => new Promise(async (resolve, reject) => {
           resolve(await cb())
@@ -315,8 +231,6 @@ describe('ArticleController test', () => {
       const next = sinon.fake();
       
       await ArticleController({sequelize}).update(req, res, next);
-      expect(next.called).to.be.equal(false);
-      expect(req.article.change.calledOnce).to.be.equal(true);
       expect(req.article.change.calledWith(req.body)).to.be.equal(true);
       expect(res.send.calledOnce).to.be.equal(true);
     });
@@ -347,7 +261,6 @@ describe('ArticleController test', () => {
       const next = sinon.fake();
       
       await ArticleController({sequelize}).delete(req, res, next);
-      expect(next.called).to.be.equal(false);
       expect(req.article.destroy.calledOnce).to.be.equal(true);
       expect(res.send.calledOnce).to.be.equal(true);
     });
