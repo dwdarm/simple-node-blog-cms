@@ -1,5 +1,7 @@
 node_modules
 
+app/public/admin
+
 mydatabase
 mydatabase_dev
 mydatabase_test
