@@ -17,7 +17,7 @@ const PasswordController = ({ User }) => {
     
     async getForgotPassword(req, res, next) {
       try {
-        res.render('forgot-password', { csrfToken: req.csrfToken() });
+        res.render('admin/forgot-password', { csrfToken: req.csrfToken() });
       } catch(err) {
         next(err);
       } 
@@ -29,7 +29,7 @@ const PasswordController = ({ User }) => {
           where: { username: req.body.username || '' }
         });
         if (!user) {
-          return res.status(404).render('notification', { 
+          return res.status(404).render('admin/notification', { 
             message: 'User not found',
             status: 'error'
           });
@@ -53,7 +53,7 @@ const PasswordController = ({ User }) => {
           html: `click this link to reset your password: <a href=${reset_url}>${reset_url}</a>`
         });
       
-        res.render('notification', { 
+        res.render('admin/notification', { 
           message: 'Reset password link sent to your email',
           status: 'success'
         });
@@ -67,7 +67,7 @@ const PasswordController = ({ User }) => {
       try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
-          return res.status(400).render('notification', { 
+          return res.status(400).render('admin/notification', { 
             message: 'Invalid token',
             status: 'error'
           });
@@ -75,7 +75,7 @@ const PasswordController = ({ User }) => {
       
         const passwordToken = await user.getPasswordToken();
         if (!passwordToken) {
-          return res.status(400).render('notification', { 
+          return res.status(400).render('admin/notification', { 
             message: 'Invalid token',
             status: 'error'
           });
@@ -83,13 +83,13 @@ const PasswordController = ({ User }) => {
      
         const isValid = await bcrypt.compare(req.params.token, passwordToken.token);
         if (!isValid) {
-          return res.status(400).render('notification', { 
+          return res.status(400).render('admin/notification', { 
             message: 'Invalid token',
             status: 'error'
           });
         }
       
-        res.render('reset-password', {
+        res.render('admin/reset-password', {
           userId: req.params.id,
           token: req.params.token,
           csrfToken: req.csrfToken()
@@ -104,7 +104,7 @@ const PasswordController = ({ User }) => {
       try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
-          return res.status(400).render('notification', { 
+          return res.status(400).render('admin/notification', { 
             message: 'Invalid token',
             status: 'error'
           });
@@ -112,7 +112,7 @@ const PasswordController = ({ User }) => {
       
         const passwordToken = await user.getPasswordToken();
         if (!passwordToken) {
-          return res.status(400).render('notification', { 
+          return res.status(400).render('admin/notification', { 
             message: 'Invalid token',
             status: 'error'
           });
@@ -120,14 +120,14 @@ const PasswordController = ({ User }) => {
      
         const isValid = await bcrypt.compare(req.params.token, passwordToken.token);
         if (!isValid) {
-          return res.status(400).render('notification', { 
+          return res.status(400).render('admin/notification', { 
             message: 'Invalid token',
             status: 'error'
           });
         }
       
         if (typeof req.body.password !== 'string' || req.body.password.length === 0) {
-          return res.status(400).render('notification', { 
+          return res.status(400).render('admin/notification', { 
             message: 'Password is too short (minimum 4 characters)',
             status: 'error'
           });
@@ -137,7 +137,7 @@ const PasswordController = ({ User }) => {
         await user.save();
         await user.setPasswordToken(null);
       
-        res.render('notification', { 
+        res.render('admin/notification', { 
           message: 'Password has been changed, now you can login',
           status: 'success'
         });
